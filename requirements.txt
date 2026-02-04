@@ -1,0 +1,7 @@
+requests
+openai-agents
+openai
+openai-agent
+fastapi["standard"]
+psycopg2
+pydantic
