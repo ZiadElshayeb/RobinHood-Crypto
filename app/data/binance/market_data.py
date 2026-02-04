@@ -2,16 +2,15 @@ import requests
 import json
 from datetime import datetime
 
-from app.schemas.market_data import Kline
+from app.schemas.market_data import Kline, TickerPrice
 
 base_url = "https://api.binance.com/api/v3"
 
-def klines(input: Kline, url: str = base_url) -> str:
+def get_klines(input: Kline, url: str = base_url) -> str:
     params = {
         "symbol": input.symbol,
         "interval": input.interval,
     }
-
     kline_response = requests.get(
         url=url + "/klines",
         params=params
@@ -30,14 +29,22 @@ def klines(input: Kline, url: str = base_url) -> str:
         output_klines += line
     return output_klines
 
+def get_ticker_price(input: TickerPrice, url: str = base_url):
+    params = {
+        "symbol": input.symbol
+    }
+    response = requests.get(
+        url=url + "/ticker/24hr",
+        params=params
+    )
+    return response.json()
+
 def main():
     # Create a Kline object, not a dictionary
-    inputs = Kline(
-        symbol='BTCUSDT',
-        interval='5m'
+    inputs = TickerPrice(
+        symbol='btcusdt'
     )
-    print(klines(inputs))
-
+    print(get_ticker_price(inputs))
 
 if __name__ == "__main__":
     main()
