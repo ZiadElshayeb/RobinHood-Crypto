@@ -1,5 +1,5 @@
 import requests
-from typing import Dict, Union, List
+from app.schemas.binance_order_book import BookTickerRequest, OrderBookRequest
 
 class BinanceOrderBook:
     BASE_URL = "https://api.binance.com"
@@ -8,9 +8,9 @@ class BinanceOrderBook:
         self.timeout = timeout
         self.session = requests.Session()
 
-    def get_best_ticker(self, symbol: str) -> Dict[str, Union[str, float]]:
+    def get_best_ticker(self, request: BookTickerRequest) -> str:
         url = f"{self.BASE_URL}/api/v3/ticker/bookTicker"
-        response = self.session.get(url, params={"symbol": symbol}, timeout=self.timeout)
+        response = self.session.get(url, params={"symbol": request.symbol}, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
 
@@ -18,37 +18,37 @@ class BinanceOrderBook:
         ask = float(data['askPrice'])
         spread = ask - bid
         spread_bps = (spread / ((ask + bid) / 2)) * 10_000 if (ask + bid) > 0 else 0
+        bid_qty = float(data['bidQty'])
+        ask_qty = float(data['askQty'])
 
-        return {
-            "symbol": symbol,
-            "type": "bookTicker",
-            "bid": bid,
-            "bid_qty": float(data['bidQty']),
-            "ask": ask,
-            "ask_qty": float(data['askQty']),
-            "spread": spread,
-            "spread_bps": spread_bps
-        }
+        header = f"{'Symbol':<12} {'Type':<15} {'Bid':<15} {'Bid Qty':<15} {'Ask':<15} {'Ask Qty':<15} {'Spread':<15} {'Spread BPS':<12}"
+        separator = "-" * 120
+        data_row = f"{request.symbol:<12} {'bookTicker':<15} {bid:<15.8f} {bid_qty:<15.2f} {ask:<15.8f} {ask_qty:<15.2f} {spread:<15.8f} {spread_bps:<12.2f}"
+        
+        return f"{header}\n{separator}\n{data_row}"
     
-    def get_order_book(self, symbol: str, limit: int = 20) -> Dict[str, Union[str, int, float, List]]:
+    def get_order_book(self, request: OrderBookRequest) -> str:
         url = f"{self.BASE_URL}/api/v3/depth"
-        response = self.session.get(url, params={"symbol": symbol, "limit": limit}, timeout=self.timeout)
+        response = self.session.get(url, params={"symbol": request.symbol, "limit": request.limit}, timeout=self.timeout)
         response.raise_for_status()
         book = response.json()
 
-        best_bid = float(book["bids"][0][0]) if book["bids"] else 0.0
-        best_ask = float(book["asks"][0][0]) if book["asks"] else 0.0
+        bids = [(float(p), float(q)) for p, q in book["bids"]]
+        asks = [(float(p), float(q)) for p, q in book["asks"]]
         
-        return {
-            "symbol": symbol,
-            "type": "depth",
-            "lastUpdateId": book.get("lastUpdateId"),
-            "best_bid": best_bid,
-            "best_ask": best_ask,
-            "spread": best_ask - best_bid,
-            "bids": [(float(p), float(q)) for p, q in book["bids"]],
-            "asks": [(float(p), float(q)) for p, q in book["asks"]]
-        }
+        bids_output = ["\nBIDS"]
+        bids_output.append(f"{'Price':<15} {'Quantity':<15}")
+        bids_output.append("-" * 30)
+        for price, qty in bids:
+            bids_output.append(f"{price:<15.8f} {qty:<15.2f}")
+        
+        asks_output = ["\nASKS"]
+        asks_output.append(f"{'Price':<15} {'Quantity':<15}")
+        asks_output.append("-" * 30)
+        for price, qty in asks:
+            asks_output.append(f"{price:<15.8f} {qty:<15.2f}")
+        
+        return "\n".join(bids_output + asks_output)
     
     def close(self):
         self.session.close()
@@ -58,14 +58,12 @@ class BinanceOrderBook:
 #     symbol = "DOGEUSDT"
     
 #     try:
-#         print(f"--- Fecthing Best Ticker for {symbol} ---")
-#         ticker = client.get_best_ticker(symbol)
-#         print(f"Bid: {ticker['bid']} | Ask: {ticker['ask']} | Spread bps: {ticker['spread_bps']:.2f}\n")
+#         print(f"--- Best Ticker for {symbol} ---")
+#         print(client.get_best_ticker(BookTickerRequest(symbol=symbol)))
+#         print()
 
-#         print(f"--- Fetching Depth (Limit=5) for {symbol} ---")
-#         depth = client.get_order_book(symbol, limit=5)
-#         print(f"Top 5 Bids: {depth['bids']}")
-#         print(f"Top 5 Asks: {depth['asks']}")
+#         print(f"--- Order Book Depth (Limit=10) for {symbol} ---")
+#         print(client.get_order_book(OrderBookRequest(symbol=symbol, limit=10)))
         
 #     except requests.RequestException as e:
 #         print(f"API Error: {e}")
