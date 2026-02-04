@@ -1,6 +1,6 @@
 requests
 openai-agents
 openai
-fastapi[standard]
+fastapi
 psycopg2
 pydantic
