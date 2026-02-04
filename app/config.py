@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = ""
 
+    # Robinhood
+    ROBINHOOD_BASE_URL: str = ""
+
     class Config:
         env_file = str(ROOT_PATH / ".env")
         case_sensitive = True
