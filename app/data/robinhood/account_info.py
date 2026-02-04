@@ -1,6 +1,7 @@
 import requests
-from app.schemas.robinhood_account_info import RobinhoodCryptoOrdersRequest
+from app.schemas.robinhood_account_info import RobinhoodCryptoOrdersRequest, RobinhoodAccountInfoResponse, RobinhoodCryptoHoldingsResponse, RobinhoodCryptoOrdersResponse, RobinhoodTradingPairsResponse
 from app.config import settings
+
 class RobinhoodAccountInfo:
     BASE_URL = settings.ROBINHOOD_BASE_URL
 
@@ -8,23 +9,23 @@ class RobinhoodAccountInfo:
         self.timeout = timeout
         self.session = requests.Session()
 
-    def get_account_info(self) -> dict:
+    def get_account_info(self) -> RobinhoodAccountInfoResponse:
         url = f"{self.BASE_URL}/get-account"
         response = self.session.post(url, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
         
-        return data
+        return RobinhoodAccountInfoResponse(**data)
     
-    def get_crypto_holdings(self) -> dict:
+    def get_crypto_holdings(self) -> RobinhoodCryptoHoldingsResponse:
         url = f"{self.BASE_URL}/getCryptoHoldings"
         response = self.session.post(url, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
         
-        return data
+        return RobinhoodCryptoHoldingsResponse(**data)
     
-    def get_crypto_orders(self, request: RobinhoodCryptoOrdersRequest) -> dict:
+    def get_crypto_orders(self, request: RobinhoodCryptoOrdersRequest) -> RobinhoodCryptoOrdersResponse:
         url = f"{self.BASE_URL}/getCryptoOrders?startDate={request.start_date}&endDate={request.end_date}&symbol={request.symbol}&type={request.type}"
         payload = {
             "start_date": request.start_date,
@@ -36,15 +37,15 @@ class RobinhoodAccountInfo:
         response.raise_for_status()
         data = response.json()
         
-        return data
+        return RobinhoodCryptoOrdersResponse(**data)
     
-    def get_trading_pairs(self) -> dict:
+    def get_trading_pairs(self) -> RobinhoodTradingPairsResponse:
         url = f"{self.BASE_URL}/getTradingPairs"
         response = self.session.post(url, timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
 
-        return data
+        return RobinhoodTradingPairsResponse(**data)
     
     def close(self):
         self.session.close()
