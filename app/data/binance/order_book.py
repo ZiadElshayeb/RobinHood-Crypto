@@ -8,7 +8,7 @@ class BinanceOrderBook:
         self.timeout = timeout
         self.session = requests.Session()
 
-    def get_best_ticker(self, request: BookTickerRequest) -> str:
+    def get_best_ticker(self, request: BookTickerRequest) -> dict:
         url = f"{self.BASE_URL}/api/v3/ticker/bookTicker"
         response = self.session.get(url, params={"symbol": request.symbol}, timeout=self.timeout)
         response.raise_for_status()
@@ -21,34 +21,45 @@ class BinanceOrderBook:
         bid_qty = float(data['bidQty'])
         ask_qty = float(data['askQty'])
 
-        header = f"{'Symbol':<12} {'Type':<15} {'Bid':<15} {'Bid Qty':<15} {'Ask':<15} {'Ask Qty':<15} {'Spread':<15} {'Spread BPS':<12}"
-        separator = "-" * 120
-        data_row = f"{request.symbol:<12} {'bookTicker':<15} {bid:<15.8f} {bid_qty:<15.2f} {ask:<15.8f} {ask_qty:<15.2f} {spread:<15.8f} {spread_bps:<12.2f}"
-        
-        return f"{header}\n{separator}\n{data_row}"
+        return {
+            "symbol": request.symbol,
+            "type": "bookTicker",
+            "bid_price": bid,
+            "ask_price": ask,
+            "spread": spread,
+            "spread_bps": spread_bps,
+            "bid_quantity": bid_qty,
+            "ask_quantity": ask_qty
+        }
     
-    def get_order_book(self, request: OrderBookRequest) -> str:
+    def get_order_book(self, request: OrderBookRequest) -> dict:
         url = f"{self.BASE_URL}/api/v3/depth"
         response = self.session.get(url, params={"symbol": request.symbol, "limit": request.limit}, timeout=self.timeout)
         response.raise_for_status()
         book = response.json()
 
-        bids = [(float(p), float(q)) for p, q in book["bids"]]
-        asks = [(float(p), float(q)) for p, q in book["asks"]]
+        best_bid = float(book["bids"][0][0]) if book["bids"] else 0.0
+        best_ask = float(book["asks"][0][0]) if book["asks"] else 0.0
+
+        bids = [ float(p) for p, _ in book["bids"]]
+        asks = [ float(p) for p, _ in book["asks"]]
+
+        bids_qty = [ float(q) for _, q in book["bids"]]
+        asks_qty = [ float(q) for _, q in book["asks"]]
         
-        bids_output = ["\nBIDS"]
-        bids_output.append(f"{'Price':<15} {'Quantity':<15}")
-        bids_output.append("-" * 30)
-        for price, qty in bids:
-            bids_output.append(f"{price:<15.8f} {qty:<15.2f}")
-        
-        asks_output = ["\nASKS"]
-        asks_output.append(f"{'Price':<15} {'Quantity':<15}")
-        asks_output.append("-" * 30)
-        for price, qty in asks:
-            asks_output.append(f"{price:<15.8f} {qty:<15.2f}")
-        
-        return "\n".join(bids_output + asks_output)
+        return {
+            "symbol": request.symbol,
+            "type": "depth",
+            "best_bid": best_bid,
+            "best_ask": best_ask,
+            "spread": best_ask - best_bid,
+            "bids": bids,
+            "bids_qty": bids_qty,
+            "asks": asks,
+            "asks_qty": asks_qty,
+            "limit": request.limit,
+            "last_update_id": book["lastUpdateId"]
+        }
     
     def close(self):
         self.session.close()
