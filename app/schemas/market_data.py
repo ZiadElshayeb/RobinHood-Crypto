@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from enum import Enum
+from typing import Optional
 
 class Intervals(str, Enum):
     # seconds
@@ -33,6 +34,19 @@ class Intervals(str, Enum):
 class Kline(BaseModel):
     symbol: str = Field()
     interval: Intervals
+    startTime: Optional[int] = None
+    endTime: Optional[int] = None
+    timeZone: Optional[str] = "UTC"
+    limit: Optional[int] = Field(default=500, gt=0, lt=1000)
+
+
+    @field_validator('symbol')
+    @classmethod
+    def uppercase_symbol(cls, v):
+        return v.upper()
+    
+class TickerPrice(BaseModel):
+    symbol: str = Field()
 
     @field_validator('symbol')
     @classmethod
