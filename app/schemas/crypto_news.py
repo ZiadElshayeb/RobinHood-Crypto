@@ -1,0 +1,60 @@
+from pydantic import BaseModel, Field
+
+class CryptoNewsRequest(BaseModel):
+    search_string: str = Field(description="The search string to query crypto news articles.", examples=["Bitcoin price surge"])
+    limit: int = Field(default=10, description="The maximum number of news articles to return.", examples=[5, 10, 20])
+    to_ts: int = Field(default=-1, description="Unix timestamp to filter news articles up to a specific time.", examples=[1625097600])
+    lang: str = Field(default="EN", description="Language code for the news articles.", examples=["EN", "ES", "FR"])
+    source_key: str = Field(default="coindesk", description="Specific source key to filter news articles.", examples=["coindesk", "cryptonews"])
+
+class CryptoNewsResponseDataItem(BaseModel):
+    TYPE: str = Field(description="The type of the news article.", examples=["121"])
+    GUID: str = Field(description="The unique identifier for the news article.", examples=["abcd1234-ef56-7890-gh12-ijklmnopqrst"])
+    ID: int = Field(description="The ID of the news article.", examples=[123456])
+    PUBLISHED_ON: int = Field(description="Unix timestamp when the article was published.", examples=[1625097600])
+    PUBLISHED_ON_NS: int | None = Field(default=None, description="Nanosecond part of the published timestamp.", examples=[0])
+    IMAGE_URL: str = Field(description="URL of the article's image.", examples=["https://example.com/image.jpg"])
+    TITLE: str = Field(description="Title of the news article.", examples=["Bitcoin Hits New All-Time High"])
+    SUBTITLE: str = Field(description="Subtitle of the news article.", examples=["The cryptocurrency market is booming."])
+    AUTHORS: str = Field(description="Authors of the news article.", examples=["John Doe"])
+    URL: str = Field(description="URL of the news article.", examples=["https://example.com/article"])
+    SOURCE_ID: int = Field(description="ID of the news source.", examples=[1])
+    BODY: str = Field(description="Body content of the news article.", examples=["The full article content goes here..."])
+    KEYWORDS: str = Field(description="Keywords associated with the news article.", examples=["Bitcoin, Cryptocurrency, Market"])
+    LANG: str = Field(description="Language code of the news article.", examples=["EN"])
+    UPVOTES: int = Field(description="Number of upvotes for the article.", examples=[100])
+    DOWNVOTES: int = Field(description="Number of downvotes for the article.", examples=[5])
+    SCORE: float = Field(description="Score of the news article.", examples=[9.5])
+    SENTIMENT: str = Field(description="Sentiment of the news article.", examples=["Positive"])
+    STATUS: str = Field(description="Status of the news article.", examples=["ACTIVE"])
+    CREATED_ON: int = Field(description="Unix timestamp when the article was created.", examples=[1625097600])
+    UPDATED_ON: int = Field(description="Unix timestamp when the article was last updated.", examples=[1625184000])
+    SOURCE_DATA: "CryptoNewsSourceData" = Field(description="Source information for the news article.")
+    CATEGORY_DATA: list["CryptoNewsCategoryData"] = Field(description="List of categories associated with the news article.")
+
+class CryptoNewsSourceData(BaseModel):
+    TYPE: str = Field(description="The type of the source.", examples=["120"])
+    ID: int = Field(description="The ID of the source.", examples=[5])
+    SOURCE_KEY: str = Field(description="The key identifier for the source.", examples=["coindesk"])
+    NAME: str = Field(description="The name of the source.", examples=["CoinDesk"])
+    IMAGE_URL: str = Field(description="URL of the source's image.", examples=["https://example.com/source.png"])
+    URL: str = Field(description="URL of the source.", examples=["https://www.coindesk.com"])
+    LANG: str = Field(description="Language code of the source.", examples=["EN"])
+    SOURCE_TYPE: str = Field(description="Type of the source.", examples=["RSS"])
+    LAUNCH_DATE: int = Field(description="Unix timestamp when the source was launched.", examples=[1367884800])
+    SORT_ORDER: int = Field(description="Sort order of the source.", examples=[0])
+    BENCHMARK_SCORE: int = Field(description="Benchmark score of the source.", examples=[71])
+    STATUS: str = Field(description="Status of the source.", examples=["ACTIVE"])
+    LAST_UPDATED_TS: int = Field(description="Unix timestamp when the source was last updated.", examples=[1770299045])
+    CREATED_ON: int = Field(description="Unix timestamp when the source was created.", examples=[1657730129])
+    UPDATED_ON: int = Field(description="Unix timestamp when the source was last updated.", examples=[1744296800])
+
+class CryptoNewsCategoryData(BaseModel):
+    TYPE: str = Field(description="The type of the category.", examples=["122"])
+    ID: int = Field(description="The ID of the category.", examples=[14])
+    NAME: str = Field(description="The name of the category.", examples=["BTC"])
+    CATEGORY: str = Field(description="The category identifier.", examples=["BTC"])
+
+class CryptoNewsResponse(BaseModel):
+    Data: list[CryptoNewsResponseDataItem] = Field(description="List of news articles.")
+    Err: dict = Field(default_factory=dict, description="Error information if any.")
