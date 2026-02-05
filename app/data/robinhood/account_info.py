@@ -1,8 +1,9 @@
 import requests
 from app.schemas.robinhood_account_info import RobinhoodCryptoOrdersRequest, RobinhoodAccountInfoResponse, RobinhoodCryptoHoldingsResponse, RobinhoodCryptoOrdersResponse, RobinhoodTradingPairsResponse
+from app.config import settings
 
 class RobinhoodAccountInfo:
-    BASE_URL = "https://robinhood.msol.work/api"
+    BASE_URL = settings.ROBINHOOD_BASE_URL
 
     def __init__(self, timeout: int = 10):
         self.timeout = timeout
