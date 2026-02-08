@@ -8,16 +8,16 @@ class BestPriceRequest(BaseModel):
     to_currency: str
 
 class BestPriceRaw(BaseModel):
-    symbol: str = Field(examples=["DOGE-USD"])
-    timestamp: str = Field(examples=["2026-02-04T15:45:48.825787513Z"])
-    price: int = Field(examples=["0.10367123"])
-    bid_inclusive_of_sell_spread: int = Field(examples=["0.10279258"])
-    sell_spread: int = Field(examples=["0.00847535"])
-    ask_inclusive_of_buy_spread: int = Field(examples=["0.10454988"])
-    buy_spread: int = Field(examples=["0.00847535"])
-
+    symbol: str
+    timestamp: str
+    price: float
+    bid_inclusive_of_sell_spread: float
+    sell_spread: float
+    ask_inclusive_of_buy_spread: float
+    buy_spread: float
+    
 class BestPriceResponse(BaseModel):
-    resutls: List[BestPriceRaw]
+    results: List[BestPriceRaw]
 
 #######################################################################
 
@@ -33,15 +33,15 @@ class BestPriceEstimatedRequest(BaseModel):
     quantity: str
 
 class BestPriceEstimatedRaw(BaseModel):
-    symbol: str = Field(examples=["DOGE-USD"])
+    symbol: str
     side: Side
-    timestamp: str = Field(examples=["2026-02-04T15:45:48.825787513Z"])
-    price: int = Field(examples=["0.10367123"])
-    bid_inclusive_of_sell_spread: int = Field(examples=["0.10279258"])
-    sell_spread: int = Field(examples=["0.00847535"])
-    ask_inclusive_of_buy_spread: int = Field(examples=["0.10454988"])
-    buy_spread: int = Field(examples=["0.00847535"])
+    timestamp: str
+    price: float
+    bid_inclusive_of_sell_spread: float
+    sell_spread: float
+    ask_inclusive_of_buy_spread: float
+    buy_spread: float
 
 class BestPriceEstimatedResponse(BaseModel):
-    resutls: List[BestPriceEstimatedRaw]
+    results: List[BestPriceEstimatedRaw]
     
