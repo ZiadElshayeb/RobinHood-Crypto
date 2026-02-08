@@ -4,3 +4,7 @@ openai
 fastapi
 psycopg2
 pydantic
+numpy
+pandas
+pandas_ta
+openai-agents[litellm]
