@@ -2,7 +2,7 @@ requests
 openai-agents
 openai
 fastapi
-psycopg2
+psycopg
 pydantic
 numpy
 pandas
