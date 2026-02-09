@@ -14,7 +14,7 @@ def get_best_price(inputs: BestPriceRequest) -> BestPriceResponse:
         json=json_body
     )
 
-    return response.json()
+    return BestPriceResponse(**response.json())
 
 
 def get_estimated_price(inputs: BestPriceEstimatedRequest) -> BestPriceEstimatedResponse:
@@ -28,7 +28,7 @@ def get_estimated_price(inputs: BestPriceEstimatedRequest) -> BestPriceEstimated
         json=json_body
     )
 
-    return response.json()
+    return BestPriceEstimatedResponse(**response.json())
 
 
 
