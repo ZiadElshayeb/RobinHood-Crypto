@@ -1,5 +1,5 @@
 import requests
-from app.schemas.robinhood_account_info import RobinhoodCryptoOrdersRequest, RobinhoodAccountInfoResponse, RobinhoodCryptoHoldingsResponse, RobinhoodCryptoOrdersResponse, RobinhoodTradingPairsResponse
+from app.schemas.robinhood_account_info import RobinhoodCryptoOrdersRequest, RobinhoodAccountInfoResponse, RobinhoodCryptoHoldingsResponse, RobinhoodCryptoOrdersResponse, RobinhoodTradingPairsResponse, RobinhoodTradingPairsRequest
 from app.config import settings
 
 class RobinhoodAccountInfo:
@@ -39,9 +39,9 @@ class RobinhoodAccountInfo:
         
         return RobinhoodCryptoOrdersResponse(**data)
     
-    def get_trading_pairs(self) -> RobinhoodTradingPairsResponse:
+    def get_trading_pairs(self, request: RobinhoodTradingPairsRequest) -> RobinhoodTradingPairsResponse:
         url = f"{self.BASE_URL}/getTradingPairs"
-        response = self.session.post(url, timeout=self.timeout)
+        response = self.session.post(url, json=request.model_dump(), timeout=self.timeout)
         response.raise_for_status()
         data = response.json()
 
@@ -66,7 +66,12 @@ class RobinhoodAccountInfo:
 #             )
 #         )
 #         print(crypto_orders)
-#         trading_pairs = client.get_trading_pairs()
+#         trading_pairs = client.get_trading_pairs(
+#             RobinhoodTradingPairsRequest(
+#                 from_currency="BTC",
+#                 to_currency="USD"
+#             )
+#         )
 #         print(trading_pairs)
 #     finally:
 #         client.close()

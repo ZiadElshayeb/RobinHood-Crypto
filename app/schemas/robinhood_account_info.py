@@ -1,10 +1,10 @@
 from pydantic import BaseModel, Field
 
 class RobinhoodCryptoOrdersRequest(BaseModel):
-    start_date: str
-    end_date: str
-    symbol: str
-    type: str
+    start_date: str = Field(examples=["2024-01-01"])
+    end_date: str = Field(examples=["2024-12-31"])
+    symbol: str = Field(examples=["BTC"])
+    type: str = Field(examples=["market", "limit", "stop_loss", "stop_limit"])
 
 class RobinhoodAccountInfoResponse(BaseModel):
     account_number: str = Field(examples=["123456789"])
@@ -46,6 +46,10 @@ class RobinhoodCryptoOrdersDataItem(BaseModel):
 
 class RobinhoodCryptoOrdersResponse(BaseModel):
     data: list[RobinhoodCryptoOrdersDataItem]
+
+class RobinhoodTradingPairsRequest(BaseModel):
+    from_currency: str = Field(examples=["BTC"])
+    to_currency: str = Field(examples=["USD"])
 
 class RobinhoodTradingPairsResultsItem(BaseModel):
     asset_code: str = Field(examples=["BTC"])
