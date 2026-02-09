@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = ""
     GEMINI_BASE_URL: str = ""
 
+    # News APIs
+    NEWS_AI_API_KEY: str = ""
+
     # Robinhood
     ROBINHOOD_BASE_URL: str = ""
 

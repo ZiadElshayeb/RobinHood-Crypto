@@ -64,19 +64,19 @@ class BinanceOrderBook:
     def close(self):
         self.session.close()
 
-if __name__ == "__main__":
-    client = BinanceOrderBook()
-    symbol = "DOGEUSDT"
+# if __name__ == "__main__":
+#     client = BinanceOrderBook()
+#     symbol = "DOGEUSDT"
     
-    try:
-        print(f"--- Best Ticker for {symbol} ---")
-        print(client.get_best_ticker(BookTickerRequest(symbol=symbol)))
-        print()
+#     try:
+#         print(f"--- Best Ticker for {symbol} ---")
+#         print(client.get_best_ticker(BookTickerRequest(symbol=symbol)))
+#         print()
 
-        print(f"--- Order Book Depth (Limit=10) for {symbol} ---")
-        print(client.get_order_book(OrderBookRequest(symbol=symbol, limit=10)))
+#         print(f"--- Order Book Depth (Limit=10) for {symbol} ---")
+#         print(client.get_order_book(OrderBookRequest(symbol=symbol, limit=10)))
         
-    except requests.RequestException as e:
-        print(f"API Error: {e}")
-    finally:
-        client.close()
+#     except requests.RequestException as e:
+#         print(f"API Error: {e}")
+#     finally:
+#         client.close()

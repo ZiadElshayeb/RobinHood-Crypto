@@ -9,7 +9,7 @@ class CryptoNews:
         self.session = requests.Session()
         self.session.headers.update({"Content-type": "application/json; charset=UTF-8"})
 
-    def search_news(self, request: CryptoNewsRequest) -> str:
+    def search_news(self, request: CryptoNewsRequest) -> CryptoNewsResponse:
         url = f"{self.BASE_URL}/search"
         params = {
             "lang": request.lang,
@@ -27,7 +27,7 @@ class CryptoNews:
         
         news_response = CryptoNewsResponse(**data)
         
-        return news_response.model_dump_json(indent=2)
+        return news_response
     
     def close(self):
         self.session.close()
