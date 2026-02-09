@@ -1,19 +1,21 @@
-import requests
+import httpx
 from datetime import datetime
-
+from agents import function_tool
 from app.schemas.market_data import Kline, TickerPrice
 
 base_url = "https://api.binance.com/api/v3"
 
-def get_klines(input: Kline, url: str = base_url) -> str:
+@function_tool
+async def get_klines(input: Kline, url: str = base_url) -> str:
     params = {
         "symbol": input.symbol,
         "interval": input.interval,
     }
-    kline_response = requests.get(
-        url=url + "/klines",
-        params=params
-    )
+    async with httpx.AsyncClient() as client:
+        kline_response = await client.get(
+            url=url + "/klines",
+            params=params
+        )
 
     output_klines = str(f"{'Open Time':<20} {'Open':<15} {'High':<15} {'Low':<15} {'Close':<15} {'Volume':<12} {'Close Time':<20} {'Quote Vol':<15} {'Trades':<10} {'Taker Buy Base':<15} {'Taker Buy Quote':<15}\n" +
     '='*180 + '\n')
@@ -28,22 +30,14 @@ def get_klines(input: Kline, url: str = base_url) -> str:
         output_klines += line
     return output_klines
 
-def get_ticker_price(input: TickerPrice, url: str = base_url):
+@function_tool
+async def get_ticker_price(input: TickerPrice, url: str = base_url):
     params = {
         "symbol": input.symbol
     }
-    response = requests.get(
-        url=url + "/ticker/24hr",
-        params=params
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            url=url + "/ticker/24hr",
+            params=params
+        )
     return response.json()
-
-def main():
-    # Create a Kline object, not a dictionary
-    inputs = TickerPrice(
-        symbol='btcusdt'
-    )
-    print(get_ticker_price(inputs))
-
-if __name__ == "__main__":
-    main()
