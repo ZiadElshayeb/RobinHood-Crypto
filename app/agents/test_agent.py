@@ -6,7 +6,8 @@ from agents import (
     set_default_openai_client,
     set_tracing_disabled,
     SQLiteSession,
-    Tool
+    Tool,
+    run_demo_loop
 )
 from openai.types.responses import ResponseTextDeltaEvent
 from app.config import settings
@@ -45,34 +46,35 @@ test_agent = Agent(
         tools=tools
     )
 
-sql_lit_session = SQLiteSession(session_id="2", db_path='conversations.db')
+#sql_lit_session = SQLiteSession(session_id="2", db_path='conversations.db')
 
 ###############################################################################
 
 async def main():
-    print("Chat with Mark (type 'exit' or 'quit' to end)")
-    print("-" * 50)
-    
-    while True:
-        user_input = input("\nYou: ").strip()
-        
-        if user_input.lower() in ['exit', 'quit', 'q']:
-            print("Goodbye!")
-            break
-        
-        if not user_input:
-            continue
-        
-        result = Runner.run_streamed(starting_agent=test_agent,
-                                    input=user_input,
-                                    session=sql_lit_session,
-                                )
-        
-        print(f"\nMark: ", end="", flush=True)
-        async for event in result.stream_events():
-            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-                print(event.data.delta, end="", flush=True)
-        print()  # New line after streaming completes
+    #print("Chat with Mark (type 'exit' or 'quit' to end)")
+    #print("-" * 50)
+    #
+    #while True:
+    #    user_input = input("\nYou: ").strip()
+    #    
+    #    if user_input.lower() in ['exit', 'quit', 'q']:
+    #        print("Goodbye!")
+    #        break
+    #    
+    #    if not user_input:
+    #        continue
+    #    
+    #    result = Runner.run_streamed(starting_agent=test_agent,
+    #                                input=user_input,
+    #                                session=sql_lit_session,
+    #                            )
+    #    
+    #    print(f"\nMark: ", end="", flush=True)
+    #    async for event in result.stream_events():
+    #        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+    #            print(event.data.delta, end="", flush=True)
+    #    print()  # New line after streaming completes
+    await run_demo_loop(test_agent)
 
 if __name__ == "__main__":
     asyncio.run(main())
