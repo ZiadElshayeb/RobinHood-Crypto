@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Meta Custom Automation"
 
     # Models APIs
+    OPENAI_API_KEY: str = ""  # For OpenAI GPT-4 (alternative to Gemini)
     GEMINI_API_KEY: str = ""
     GEMINI_MODEL: str = ""
     GEMINI_BASE_URL: str = ""

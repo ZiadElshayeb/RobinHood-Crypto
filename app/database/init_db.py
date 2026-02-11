@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def init_tables():
+async def init_tables():
     """
     Creates the necessary tables in the database if they don't exist.
     """
@@ -39,10 +39,10 @@ def init_tables():
 
     try:
         logger.info("🔨 Creating 'trade_history' table...")
-        db.execute_write(create_trades_table)
+        await db.execute_write(create_trades_table)
         
         logger.info("🔨 Creating 'system_logs' table...")
-        db.execute_write(create_logs_table)
+        await db.execute_write(create_logs_table)
         
         logger.info("✅ Database initialized successfully!")
         
@@ -50,4 +50,5 @@ def init_tables():
         logger.error(f"❌ Failed to initialize database: {e}")
 
 if __name__ == "__main__":
-    init_tables()
+    import asyncio
+    asyncio.run(init_tables())

@@ -1,86 +1,86 @@
-import psycopg2
+from __future__ import annotations
+from typing import Any, Sequence
+from psycopg import AsyncConnection
+from psycopg.abc import Query
+
 from app.config import settings
 import logging
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
-
 logger = logging.getLogger(__name__)
 
 class Database:
-
-    def __init__(self):
+    def __init__(self) -> None:
         self.user = settings.POSTGRES_USER
         self.password = settings.POSTGRES_PASSWORD
         self.host = settings.POSTGRES_HOST
         self.port = settings.POSTGRES_PORT
         self.db = settings.POSTGRES_DB
 
-    def get_connection(self):
-        """Creates and returns a new database connection."""
+    async def get_connection(self) -> AsyncConnection:
+        """Creates and returns a new async database connection."""
         try:
-            conn = psycopg2.connect(
+            conn = await AsyncConnection.connect(
                 host=self.host,
-                database=self.db,
+                dbname=self.db,
                 user=self.user,
                 password=self.password,
                 port=self.port,
-                sslmode='require'
+                sslmode="require",
             )
             return conn
         except Exception as e:
             logger.error(f"❌ Database connection failed: {e}")
             raise RuntimeError(f"Database connection error: {e}")
 
-    def fetch_one(self, query: str, args=None):
-        """Read 1 row"""
+    async def fetch_one(self, query: Query, args: Sequence[Any] | None = None) -> Any | None:
+        """Read 1 row."""
         try:
-            with self.get_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(query, vars=args)
-                    result = cur.fetchone()
-                    return result
+            async with await self.get_connection() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(query, args or ())
+                    return await cur.fetchone()
         except Exception as e:
             logger.error(f"❌ fetch_one failed: {e}")
             raise
 
-    def fetch_all(self, query: str, args=None):
-        """Read all rows"""
+    async def fetch_all(self, query: Query, args: Sequence[Any] | None = None) -> list[Any]:
+        """Read all rows."""
         try:
-            with self.get_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(query, vars=args)
-                    results = cur.fetchall()
-                    return results
+            async with await self.get_connection() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(query, args or ())
+                    return await cur.fetchall()
         except Exception as e:
             logger.error(f"❌ fetch_all failed: {e}")
             raise
 
-    def execute_write(self, query: str, *args) -> int:
+    async def execute_write(self, query: Query, args: Sequence[Any] | None = None) -> int:
         """
-        Generic method for Insert, Update, DELETE.
+        Generic method for INSERT/UPDATE/DELETE.
         Returns the number of rows affected.
         """
         try:
-            with self.get_connection() as conn:
-                with conn.cursor() as cur:
-                    cur.execute(query, vars=args)
-                    conn.commit() # Save changes
+            async with await self.get_connection() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(query, args or ())
+                    await conn.commit()
                     logger.info(f"✅ Query executed. Rows affected: {cur.rowcount}")
                     return cur.rowcount
         except Exception as e:
             logger.error(f"❌ Write operation failed: {e}")
             raise
 
-    # Wrappers for specific actions (optional, but good for readability)
-    def insert_row(self, query: str, *args):
-        return self.execute_write(query, args)
+    # Optional wrappers
+    async def insert_row(self, query: Query, args: Sequence[Any] | None = None) -> int:
+        return await self.execute_write(query, args)
 
-    def update_row(self, query: str, *args):
-        return self.execute_write(query, args)
+    async def update_row(self, query: Query, args: Sequence[Any] | None = None) -> int:
+        return await self.execute_write(query, args)
 
-    def delete_row(self, query: str, *args):
-        return self.execute_write(query, args)
+    async def delete_row(self, query: Query, args: Sequence[Any] | None = None) -> int:
+        return await self.execute_write(query, args)
