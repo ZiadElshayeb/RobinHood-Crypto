@@ -2,9 +2,13 @@ requests
 openai-agents
 openai
 fastapi
-psycopg
+psycopg[binary]
 pydantic
 numpy
 pandas
-pandas_ta
+pandas-ta-classic
 openai-agents[litellm]
+websockets
+httpx
+pydantic-settings
+python-dotenv
