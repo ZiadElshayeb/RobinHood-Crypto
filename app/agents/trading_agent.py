@@ -112,11 +112,11 @@ class SchemaCleaningTransport(httpx.AsyncHTTPTransport):
 
 
 # Event hooks (kept, but do nothing)
-async def log_request(request: httpx.Request):
+async def log_request(_request: httpx.Request):
     return
 
 
-async def log_response(response: httpx.Response):
+async def log_response(_response: httpx.Response):
     return
 
 
@@ -160,15 +160,18 @@ crypto_trader_agent = Agent(
 **MISSION**: Analyze DOGE market conditions every cycle and make a BUY, SELL, or HOLD decision.
 
 **AUTONOMOUS WORKFLOW**:
-1. Get DOGE price: call get_ticker_price(symbol="DOGEUSDT")
-2. Check order book: call get_order_book(request={"symbol":"DOGEUSDT","limit":int})
-3. Get recent candles: call get_klines(symbol="DOGEUSDT", interval="15m", limit=int)
-4. Search news: call search_crypto_news(request={"search_string":"DOGE","limit":int})
-5. Check holdings: call get_crypto_holdings()
-6. Review recent actions: call get_recent_actions(limit=int)
-7. MAKE DECISION: Based on ALL data, decide BUY, SELL, or HOLD
-8. LOG DECISION: call log_action() with your decision
-9. LOG TOOL RESULTS: call log_tool_results() with the analysis results
+1. Get Account Info: call get_account_info() to understand current holdings and buying power
+2. Get DOGE price: call get_ticker_price(symbol="DOGEUSDT")
+3. Get Trading Pairs: call get_trading_pairs(request={"from_currency":"DOGE", "to_currency":"USDT"}) to see available DOGE pairs
+4. Check order book: call get_order_book(request={"symbol":"DOGEUSDT","limit":int})
+5. Get recent candles: call get_klines(symbol="DOGEUSDT", interval="15m", limit=int)
+6. Search crypto news: call search_crypto_news(request={"search_string":"DOGE","limit":int})
+7. Search global news: call search_global_news(request={"search_string":str,"articlesCount":int, "dateStart":"YYYY-MM-DD", "dateEnd":"YYYY-MM-DD", "apiKey":""})
+8. Check holdings: call get_crypto_holdings()
+9. Review recent actions: call get_recent_actions(limit=int)
+10. MAKE DECISION: Based on ALL data, decide BUY, SELL, or HOLD
+11. LOG DECISION: call log_action() with your decision
+12. LOG TOOL RESULTS: call log_tool_results() with the analysis results
 **DECISION CRITERIA**:
 - BUY: Strong upward momentum, positive news, oversold conditions, order book shows demand
 - SELL: Downward momentum, negative news, overbought conditions, order book shows supply pressure
@@ -214,7 +217,7 @@ async def main():
 
             autonomous_prompt = (
                 "Analyze DOGE market conditions right now. "
-                "Follow your workflow: get price, check order book, analyze candles, search news, "
+                "Follow your workflow: get account info, get price, get trading pairs, check order book, analyze candles, search crypto news, search global news. "
                 "check holdings, review recent actions, then make a BUY/SELL/HOLD decision and log it using log_action and log_tool_results."
             )
 
