@@ -162,7 +162,7 @@ crypto_trader_agent = Agent(
 **AUTONOMOUS WORKFLOW**:
 1. Get Account Info: call get_account_info() to understand current holdings and buying power
 2. Get DOGE price: call get_ticker_price(symbol="DOGEUSDT")
-3. Get Trading Pairs: call get_trading_pairs(request={"from_currency":"DOGE", "to_currency":"USDT"}) to see available DOGE pairs
+3. Get Trading Pairs: call get_trading_pairs(request={"from_currency":"DOGE", "to_currency":"USD"}) to see available DOGE pairs
 4. Check order book: call get_order_book(request={"symbol":"DOGEUSDT","limit":int})
 5. Get recent candles: call get_klines(symbol="DOGEUSDT", interval="15m", limit=int)
 6. Search crypto news: call search_crypto_news(request={"search_string":"DOGE","limit":int})
